@@ -1045,17 +1045,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
 })
 
 // Check session on load
-sb.auth.getSession().then(({data:{session}})=>{
-  if(session){
-    CU = session.user
-    sb.from('profiles').select('*').eq('id',CU.id).single().then(({data:profile})=>{
-      PROFILE = profile
-      loadDeals().then(()=>{ buildShell(); navigate('dash') })
-    })
-  } else {
-    $('app').innerHTML=getAuthHTML()
-    applyLang()
-  }
+sb.auth.getSession().then(({data:{session}})=>{ if(!session){ $('app').innerHTML=getAuthHTML(); applyLang() } })
 })</script>
 </body>
 </html>

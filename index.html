@@ -1029,23 +1029,39 @@ window.handleSubmitRating = async () => {
 // ══════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════
-sb.auth.onAuthStateChange(async (event, session) => {
+// Check session on load FIRST (handles page refresh)
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession()
   if(session) {
     CU = session.user
-    const {data:profile}=await sb.from('profiles').select('*').eq('id',CU.id).single()
-    PROFILE=profile
+    const {data:profile} = await sb.from('profiles').select('*').eq('id',CU.id).single()
+    PROFILE = profile
     await loadDeals()
     buildShell()
     await navigate('dash')
   } else {
+    $('app').innerHTML = getAuthHTML()
+    applyLang()
+  }
+}
+
+// Listen for auth changes (login/logout)
+sb.auth.onAuthStateChange(async (event, session) => {
+  if(event === 'SIGNED_IN' && !CU) {
+    CU = session.user
+    const {data:profile} = await sb.from('profiles').select('*').eq('id',CU.id).single()
+    PROFILE = profile
+    await loadDeals()
+    buildShell()
+    await navigate('dash')
+  } else if(event === 'SIGNED_OUT') {
     CU=null; PROFILE=null; DEALS=[]
-    $('app').innerHTML=getAuthHTML()
+    $('app').innerHTML = getAuthHTML()
     applyLang()
   }
 })
 
-// Check session on load
-sb.auth.getSession().then(({data:{session}})=>{ if(!session){ $('app').innerHTML=getAuthHTML(); applyLang() } })
-})</script>
+boot()
+</script>
 </body>
 </html>

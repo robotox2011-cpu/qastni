@@ -1035,17 +1035,12 @@ async function startApp(session) {
     applyLang()
     return
   }
-  try {
-    CU = session.user
-    const {data:profile} = await sb.from('profiles').select('*').eq('id',CU.id).single()
-    PROFILE = profile
-    await loadDeals()
-    buildShell()
-    await navigate('dash')
-  } catch(e) {
-    $('app').innerHTML=getAuthHTML()
-    applyLang()
-  }
+  CU = session.user
+  const {data:profile} = await sb.from('profiles').select('*').eq('id',CU.id).single()
+  PROFILE = profile || {}
+  await loadDeals()
+  buildShell()
+  await navigate('dash')
 }
 sb.auth.onAuthStateChange(async (event, session) => {
   if(event === 'SIGNED_IN')  { if(!CU) await startApp(session) }

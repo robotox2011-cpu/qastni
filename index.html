@@ -273,11 +273,8 @@ select.form-control{cursor:pointer}
 const { createClient } = supabase
 const sb = createClient(
   'https://ovinfpvwrdmqasxiveek.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92aW5mcHZ3cmRtcWFzeGl2ZWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzcyNjksImV4cCI6MjA5MDAxMzI2OX0.LEPaswPoJAqdW2TSjMxyw6yXxn8wGLdDt38oi0KEqFg',
-  { auth: { persistSession:true, storageKey:'qastni-auth', autoRefreshToken:true, detectSessionInUrl:false } }
-)
-  'https://ovinfpvwrdmqasxiveek.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92aW5mcHZ3cmRtcWFzeGl2ZWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzcyNjksImV4cCI6MjA5MDAxMzI2OX0.LEPaswPoJAqdW2TSjMxyw6yXxn8wGLdDt38oi0KEqFg'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92aW5mcHZ3cmRtcWFzeGl2ZWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzcyNjksImV4cCI6MjA5MDAxMzI2OX0.LEPaswPoJAqdW2TSjMxyw6yXxn8wGLdDt38ari0KEqFg',
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'qastni_auth_v1' } }
 )
 
 // ══════════════════════════════════════
@@ -1033,30 +1030,43 @@ window.handleSubmitRating = async () => {
 // ══════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════
-async function startApp(session) {
-  if(!session) {
-    $('app').innerHTML=getAuthHTML()
-    applyLang()
-    return
-  }
-  CU = session.user
-  const {data:profile} = await sb.from('profiles').select('*').eq('id',CU.id).single()
-  PROFILE = profile || {}
-  await loadDeals()
-  buildShell()
-  await navigate('dash')
-}
-sb.auth.onAuthStateChange(async (event, session) => {
-  if(event === 'SIGNED_IN')  { if(!CU) await startApp(session) }
-  if(event === 'SIGNED_OUT') { CU=null; PROFILE=null; DEALS=[]; $('app').innerHTML=getAuthHTML(); applyLang() }
-  if(event === 'TOKEN_REFRESHED') { CU = session.user }
-})
-
-// Handle page refresh
+// BOOT
 ;(async () => {
-  const { data: { session } } = await sb.auth.getSession()
-  await startApp(session)
+  try {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
+      CU = session.user
+      const { data: profile } = await sb.from('profiles').select('*').eq('id', CU.id).single()
+      PROFILE = profile || {}
+      await loadDeals()
+      buildShell()
+      await navigate('dash')
+    } else {
+      $('app').innerHTML = getAuthHTML()
+      applyLang()
+    }
+  } catch(e) {
+    console.error('Boot error:', e)
+    $('app').innerHTML = getAuthHTML()
+    applyLang()
+  }
 })()
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && !CU) {
+    CU = session.user
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', CU.id).single()
+    PROFILE = profile || {}
+    await loadDeals()
+    buildShell()
+    await navigate('dash')
+  }
+  if (event === 'SIGNED_OUT') {
+    CU = null; PROFILE = null; DEALS = []
+    $('app').innerHTML = getAuthHTML()
+    applyLang()
+  }
+})
 </script>
 </body>
 </html>

@@ -198,7 +198,7 @@ textarea.fc{resize:vertical;min-height:80px}
 <script>
 const SURL='https://ovinfpvwrdmqasxiveek.supabase.co'
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92aW5mcHZ3cmRtcWFzeGl2ZWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzcyNjksImV4cCI6MjA5MDAxMzI2OX0.LEPaswPoJAqdW2TSjMxyw6yXxn8wGLdDt38oi0KEqFg'
-window.sb=supabase.createClient(SURL,SKEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'qastni_v5'}})
+const sb=supabase.createClient(SURL,SKEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'qastni_v5'}})
 
 let CU=null,PRF=null,DEALS=[],lang=localStorage.getItem('ql')||'ar',page='dash',filt='all',RS={dealId:null,email:null,stars:0}
 

@@ -710,5 +710,9 @@ sb.auth.getSession().then(async({data:{session}})=>{
   }
 })
 </script>
-</body>
+<script>
+  window.onerror = function(msg, url, line) {
+    document.body.innerHTML = '<div style="color:red; padding:20px; text-align:center;"><h3>فيه خطأ برمجيا!</h3><p>' + msg + '</p><p>السطر: ' + line + '</p></div>';
+  };
+</script></body>
 </html>
